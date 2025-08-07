@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import IslandMap from './pages/IslandMap';
 import CharacterCustomization from './pages/CharacterCustomization';
 import GameWorld from './pages/GameWorld';
+import CityView from './pages/CityView';
 import Inventory from './pages/Inventory';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/map" element={<IslandMap />} />
             <Route path="/character" element={<CharacterCustomization />} />
             <Route path="/game/:islandId" element={<GameWorld />} />
+            <Route path="/city/:islandId" element={<CityView />} />
             <Route path="/inventory" element={<Inventory />} />
           </Routes>
         </BrowserRouter>

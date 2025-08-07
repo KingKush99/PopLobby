@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -10,6 +10,8 @@ import { mockData } from '../data/mock';
 const IslandMap = () => {
   const navigate = useNavigate();
   const { gameProgress } = useGame();
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [selectedIsland, setSelectedIsland] = useState(null);
 
   const getIslandProgress = (islandId) => {
     const progress = gameProgress[islandId];
@@ -17,18 +19,6 @@ const IslandMap = () => {
     const island = mockData.islands.find(i => i.id === islandId);
     if (!island) return 0;
     return Math.round((progress.completedQuests?.length || 0) / island.quests.length * 100);
-  };
-
-  const getIslandArt = (islandId) => {
-    const artMap = {
-      'mythology': '🏛️',
-      'spy': '🏢', 
-      'time_tangled': '⏰',
-      'survival': '🏔️',
-      'shrink_ray': '🔬',
-      'ghost_story': '👻'
-    };
-    return artMap[islandId] || '🏝️';
   };
 
   const getIslandStructure = (islandId) => {
@@ -51,22 +41,22 @@ const IslandMap = () => {
           <div className="absolute bottom-0 w-20 h-4 bg-blue-600 rounded-full"></div>
         </div>
       ),
-      'survival': (
+      'monster_carnival': (
         <div className="relative w-full h-32 flex items-end justify-center">
-          <div className="text-6xl mb-2">🏔️</div>
-          <div className="absolute bottom-0 w-20 h-4 bg-green-700 rounded-full"></div>
+          <div className="text-6xl mb-2">🎪</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-red-600 rounded-full"></div>
         </div>
       ),
-      'shrink_ray': (
+      'super_power': (
         <div className="relative w-full h-32 flex items-end justify-center">
-          <div className="text-6xl mb-2">🔬</div>
-          <div className="absolute bottom-0 w-20 h-4 bg-purple-600 rounded-full"></div>
+          <div className="text-6xl mb-2">🦸‍♂️</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-yellow-600 rounded-full"></div>
         </div>
       ),
-      'ghost_story': (
+      'wild_west': (
         <div className="relative w-full h-32 flex items-end justify-center">
-          <div className="text-6xl mb-2">👻</div>
-          <div className="absolute bottom-0 w-20 h-4 bg-gray-800 rounded-full"></div>
+          <div className="text-6xl mb-2">🤠</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-brown-600 rounded-full"></div>
         </div>
       )
     };
@@ -78,12 +68,57 @@ const IslandMap = () => {
     );
   };
 
+  const handleIslandClick = (island) => {
+    if (island.status === 'locked') return;
+    
+    setSelectedIsland(island);
+    setIsTransitioning(true);
+    
+    // Show clouds for 3 seconds then navigate
+    setTimeout(() => {
+      navigate(`/city/${island.id}`);
+    }, 3000);
+  };
+
   // Arrange islands in the classic Poptropica 2x3 grid layout
   const topRowIslands = mockData.islands.slice(0, 3);
   const bottomRowIslands = mockData.islands.slice(3, 6);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-sky-400 to-sky-500 relative">
+    <div className="min-h-screen bg-gradient-to-b from-sky-400 to-sky-500 relative overflow-hidden">
+      {/* Transition Clouds Overlay */}
+      {isTransitioning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-sky-400">
+          {/* Animated Clouds */}
+          <div className="relative w-full h-full">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute bg-white rounded-full opacity-90 animate-float"
+                style={{
+                  width: `${Math.random() * 150 + 100}px`,
+                  height: `${Math.random() * 80 + 60}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${Math.random() * 3 + 2}s`
+                }}
+              />
+            ))}
+            
+            {/* Transition Text */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-lg">
+                  Traveling to {selectedIsland?.name}...
+                </h2>
+                <div className="animate-spin text-6xl">🎈</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Classic Poptropica Header */}
       <div className="relative z-20 bg-sky-400 pb-4">
         {/* Top navigation bar */}
@@ -118,22 +153,36 @@ const IslandMap = () => {
         <div className="absolute top-16 right-24 w-14 h-9 bg-white rounded-full opacity-80"></div>
       </div>
 
-      {/* Classic Sandy Background */}
-      <div className="relative z-10 min-h-screen bg-gradient-to-b from-amber-200 to-amber-300" 
-           style={{
-             backgroundImage: `
-               radial-gradient(circle at 25% 25%, rgba(222, 184, 135, 0.3) 0%, transparent 25%),
-               radial-gradient(circle at 75% 75%, rgba(210, 180, 140, 0.2) 0%, transparent 25%),
-               radial-gradient(circle at 50% 100%, rgba(205, 165, 100, 0.1) 0%, transparent 50%)
-             `
-           }}>
+      {/* Sandy Map Background with Texture */}
+      <div 
+        className="relative z-10 min-h-screen" 
+        style={{
+          background: `
+            linear-gradient(180deg, 
+              rgba(240, 220, 130, 0.9) 0%, 
+              rgba(218, 182, 91, 0.9) 30%,
+              rgba(205, 165, 85, 0.9) 60%,
+              rgba(195, 155, 80, 0.9) 100%
+            ),
+            radial-gradient(circle at 25% 25%, rgba(222, 184, 135, 0.4) 0%, transparent 40%),
+            radial-gradient(circle at 75% 75%, rgba(210, 180, 140, 0.3) 0%, transparent 40%),
+            repeating-linear-gradient(
+              45deg,
+              rgba(160, 130, 80, 0.1) 0px,
+              rgba(160, 130, 80, 0.1) 3px,
+              transparent 3px,
+              transparent 8px
+            )
+          `
+        }}
+      >
         
         {/* Navigation arrows */}
         <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-30">
           <Button 
             variant="ghost" 
             size="lg"
-            className="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-none"
+            className="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-none shadow-lg"
             style={{ clipPath: 'polygon(0 50%, 100% 0, 100% 100%)' }}
           >
             <ChevronLeft className="w-8 h-8" />
@@ -144,7 +193,7 @@ const IslandMap = () => {
           <Button 
             variant="ghost" 
             size="lg"
-            className="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-none"
+            className="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-none shadow-lg"
             style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}
           >
             <ChevronRight className="w-8 h-8" />
@@ -174,16 +223,23 @@ const IslandMap = () => {
                       isLocked ? 'opacity-60 cursor-not-allowed border-gray-400' : 
                       isCompleted ? 'border-yellow-400 shadow-yellow-400/50' : 'border-amber-600'
                     } shadow-2xl bg-gradient-to-b from-amber-100 to-amber-200`}
-                    onClick={() => !isLocked && navigate(`/game/${island.id}`)}
+                    onClick={() => handleIslandClick(island)}
                   >
                     <CardContent className="p-0 h-full flex items-end justify-center relative">
                       {/* Island Structure */}
                       {getIslandStructure(island.id)}
                       
-                      {/* Lock overlay */}
+                      {/* White Clouds for Locked Islands */}
                       {isLocked && (
-                        <div className="absolute inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center rounded-3xl">
-                          <div className="text-4xl">🔒</div>
+                        <div className="absolute inset-0 bg-sky-200 bg-opacity-90 flex items-center justify-center rounded-3xl overflow-hidden">
+                          {/* Multiple white clouds */}
+                          <div className="absolute w-16 h-10 bg-white rounded-full opacity-90 top-4 left-4 animate-float"></div>
+                          <div className="absolute w-20 h-12 bg-white rounded-full opacity-80 top-8 right-6 animate-float" style={{animationDelay: '1s'}}></div>
+                          <div className="absolute w-14 h-8 bg-white rounded-full opacity-85 bottom-6 left-6 animate-float" style={{animationDelay: '0.5s'}}></div>
+                          <div className="absolute w-18 h-11 bg-white rounded-full opacity-75 bottom-4 right-4 animate-float" style={{animationDelay: '1.5s'}}></div>
+                          
+                          {/* Lock icon in center */}
+                          <div className="relative z-10 text-4xl">🔒</div>
                         </div>
                       )}
                       
@@ -236,16 +292,23 @@ const IslandMap = () => {
                       isLocked ? 'opacity-60 cursor-not-allowed border-gray-400' : 
                       isCompleted ? 'border-yellow-400 shadow-yellow-400/50' : 'border-amber-600'
                     } shadow-2xl bg-gradient-to-b from-amber-100 to-amber-200`}
-                    onClick={() => !isLocked && navigate(`/game/${island.id}`)}
+                    onClick={() => handleIslandClick(island)}
                   >
                     <CardContent className="p-0 h-full flex items-end justify-center relative">
                       {/* Island Structure */}
                       {getIslandStructure(island.id)}
                       
-                      {/* Lock overlay */}
+                      {/* White Clouds for Locked Islands */}
                       {isLocked && (
-                        <div className="absolute inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center rounded-3xl">
-                          <div className="text-4xl">🔒</div>
+                        <div className="absolute inset-0 bg-sky-200 bg-opacity-90 flex items-center justify-center rounded-3xl overflow-hidden">
+                          {/* Multiple white clouds */}
+                          <div className="absolute w-16 h-10 bg-white rounded-full opacity-90 top-4 left-4 animate-float"></div>
+                          <div className="absolute w-20 h-12 bg-white rounded-full opacity-80 top-8 right-6 animate-float" style={{animationDelay: '1s'}}></div>
+                          <div className="absolute w-14 h-8 bg-white rounded-full opacity-85 bottom-6 left-6 animate-float" style={{animationDelay: '0.5s'}}></div>
+                          <div className="absolute w-18 h-11 bg-white rounded-full opacity-75 bottom-4 right-4 animate-float" style={{animationDelay: '1.5s'}}></div>
+                          
+                          {/* Lock icon in center */}
+                          <div className="relative z-10 text-4xl">🔒</div>
                         </div>
                       )}
                       
@@ -296,28 +359,17 @@ const IslandMap = () => {
           </div>
         </div>
 
-        {/* Sandy texture overlay */}
-        <div 
-          className="absolute inset-0 opacity-10 pointer-events-none"
-          style={{
-            backgroundImage: `
-              repeating-linear-gradient(
-                45deg,
-                rgba(139, 69, 19, 0.1) 0px,
-                rgba(139, 69, 19, 0.1) 2px,
-                transparent 2px,
-                transparent 4px
-              )
-            `
-          }}
-        ></div>
+        {/* Decorative elements scattered around the map */}
+        <div className="absolute top-1/4 left-1/4 w-8 h-8 bg-yellow-300 rounded-full opacity-60 animate-pulse"></div>
+        <div className="absolute top-1/3 right-1/4 w-6 h-6 bg-orange-300 rounded-full opacity-50 animate-pulse" style={{animationDelay: '1s'}}></div>
+        <div className="absolute bottom-1/4 left-1/3 w-10 h-10 bg-amber-300 rounded-full opacity-40 animate-pulse" style={{animationDelay: '2s'}}></div>
       </div>
 
       {/* Custom animations */}
       <style jsx>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
+          50% { transform: translateY(-15px) rotate(2deg); }
         }
         
         .animate-float {
