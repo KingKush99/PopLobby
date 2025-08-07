@@ -1,33 +1,15 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Home, Lock, Star, Clock, Zap } from 'lucide-react';
+import { Home, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useGame } from '../contexts/GameContext';
 import { mockData } from '../data/mock';
 
 const IslandMap = () => {
   const navigate = useNavigate();
   const { gameProgress } = useGame();
-
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case 'Easy': return 'bg-green-500';
-      case 'Medium': return 'bg-yellow-500';
-      case 'Hard': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getDifficultyIcon = (difficulty) => {
-    switch (difficulty) {
-      case 'Easy': return <Star className="w-4 h-4" />;
-      case 'Medium': return <Clock className="w-4 h-4" />;
-      case 'Hard': return <Zap className="w-4 h-4" />;
-      default: return <Star className="w-4 h-4" />;
-    }
-  };
 
   const getIslandProgress = (islandId) => {
     const progress = gameProgress[islandId];
@@ -37,195 +19,309 @@ const IslandMap = () => {
     return Math.round((progress.completedQuests?.length || 0) / island.quests.length * 100);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-cyan-400 via-blue-400 to-purple-500 relative overflow-hidden">
-      {/* Animated clouds */}
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-32 h-20 bg-white bg-opacity-30 rounded-full animate-float"></div>
-        <div className="absolute top-40 right-20 w-24 h-16 bg-white bg-opacity-25 rounded-full animate-float-delay"></div>
-        <div className="absolute bottom-32 left-1/4 w-40 h-24 bg-white bg-opacity-20 rounded-full animate-float"></div>
+  const getIslandArt = (islandId) => {
+    const artMap = {
+      'mythology': '🏛️',
+      'spy': '🏢', 
+      'time_tangled': '⏰',
+      'survival': '🏔️',
+      'shrink_ray': '🔬',
+      'ghost_story': '👻'
+    };
+    return artMap[islandId] || '🏝️';
+  };
+
+  const getIslandStructure = (islandId) => {
+    const structures = {
+      'mythology': (
+        <div className="relative w-full h-32 flex items-end justify-center">
+          <div className="text-6xl mb-2">🏛️</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-amber-700 rounded-full"></div>
+        </div>
+      ),
+      'spy': (
+        <div className="relative w-full h-32 flex items-end justify-center">
+          <div className="text-6xl mb-2">🏢</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-gray-600 rounded-full"></div>
+        </div>
+      ),
+      'time_tangled': (
+        <div className="relative w-full h-32 flex items-end justify-center">
+          <div className="text-6xl mb-2">⏰</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-blue-600 rounded-full"></div>
+        </div>
+      ),
+      'survival': (
+        <div className="relative w-full h-32 flex items-end justify-center">
+          <div className="text-6xl mb-2">🏔️</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-green-700 rounded-full"></div>
+        </div>
+      ),
+      'shrink_ray': (
+        <div className="relative w-full h-32 flex items-end justify-center">
+          <div className="text-6xl mb-2">🔬</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-purple-600 rounded-full"></div>
+        </div>
+      ),
+      'ghost_story': (
+        <div className="relative w-full h-32 flex items-end justify-center">
+          <div className="text-6xl mb-2">👻</div>
+          <div className="absolute bottom-0 w-20 h-4 bg-gray-800 rounded-full"></div>
+        </div>
+      )
+    };
+    return structures[islandId] || (
+      <div className="relative w-full h-32 flex items-end justify-center">
+        <div className="text-6xl mb-2">🏝️</div>
+        <div className="absolute bottom-0 w-20 h-4 bg-amber-600 rounded-full"></div>
       </div>
+    );
+  };
 
-      {/* Navigation Header */}
-      <nav className="relative z-10 p-6 flex justify-between items-center bg-white bg-opacity-10 backdrop-blur-sm">
-        <Button 
-          variant="ghost" 
-          className="text-white hover:bg-white hover:bg-opacity-20 transition-colors duration-200"
-          onClick={() => navigate('/')}
-        >
-          <Home className="w-5 h-5 mr-2" />
-          Home
-        </Button>
-        
-        <h1 className="text-3xl font-bold text-white drop-shadow-lg">Island Map</h1>
-        
-        <div className="w-20"></div> {/* Spacer */}
-      </nav>
+  // Arrange islands in the classic Poptropica 2x3 grid layout
+  const topRowIslands = mockData.islands.slice(0, 3);
+  const bottomRowIslands = mockData.islands.slice(3, 6);
 
-      {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-6 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-white mb-4 drop-shadow-lg">
-            Choose Your Adventure
-          </h2>
-          <p className="text-xl text-white opacity-90 max-w-2xl mx-auto drop-shadow-md">
-            Select an island to begin your quest. Each island offers unique challenges and exciting rewards!
-          </p>
-        </div>
-
-        {/* Islands Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {mockData.islands.map((island) => {
-            const progress = getIslandProgress(island.id);
-            const isLocked = island.status === 'locked';
-            const isCompleted = progress === 100;
-
-            return (
-              <Card 
-                key={island.id}
-                className={`relative overflow-hidden transform hover:scale-105 transition-all duration-300 cursor-pointer border-0 shadow-2xl
-                  ${isLocked ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-3xl'}
-                  ${isCompleted ? 'ring-4 ring-yellow-400' : ''}`}
-                onClick={() => !isLocked && navigate(`/game/${island.id}`)}
-              >
-                {/* Island Image/Background */}
-                <div className="h-48 bg-gradient-to-br from-emerald-400 to-teal-600 relative overflow-hidden">
-                  {/* Placeholder for island imagery */}
-                  <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
-                    <div className="text-6xl">
-                      {island.id === 'mythology' && '⚡'}
-                      {island.id === 'spy' && '🕵️'}
-                      {island.id === 'time_tangled' && '⏰'}
-                      {island.id === 'survival' && '🏕️'}
-                      {island.id === 'shrink_ray' && '🔬'}
-                      {island.id === 'ghost_story' && '👻'}
-                    </div>
-                  </div>
-                  
-                  {/* Lock overlay */}
-                  {isLocked && (
-                    <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
-                      <Lock className="w-16 h-16 text-white" />
-                    </div>
-                  )}
-                  
-                  {/* Completion badge */}
-                  {isCompleted && (
-                    <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full font-bold text-sm flex items-center">
-                      <Star className="w-4 h-4 mr-1 fill-current" />
-                      Completed!
-                    </div>
-                  )}
-                  
-                  {/* Progress bar */}
-                  {!isLocked && progress > 0 && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-30 p-2">
-                      <div className="bg-white bg-opacity-20 rounded-full h-2">
-                        <div 
-                          className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
-                      <div className="text-white text-xs mt-1 text-center">
-                        Progress: {progress}%
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge className={`${getDifficultyColor(island.difficulty)} text-white`}>
-                      {getDifficultyIcon(island.difficulty)}
-                      <span className="ml-1">{island.difficulty}</span>
-                    </Badge>
-                    <div className="text-sm text-gray-500">
-                      {island.quests.length} quest{island.quests.length !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                  
-                  <CardTitle className="text-2xl text-gray-800 mb-2">
-                    {island.name}
-                  </CardTitle>
-                  
-                  <CardDescription className="text-gray-600">
-                    {island.description}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                  {isLocked ? (
-                    <div className="text-center py-4">
-                      <Lock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-500">Complete other islands to unlock</p>
-                    </div>
-                  ) : (
-                    <Button 
-                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-3 rounded-lg transform hover:scale-105 transition-all duration-200"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigate(`/game/${island.id}`);
-                      }}
-                    >
-                      {progress > 0 ? 'Continue Adventure' : 'Start Adventure'}
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Legend */}
-        <div className="mt-16 text-center">
-          <h3 className="text-2xl font-bold text-white mb-6">Island Difficulty Guide</h3>
-          <div className="flex justify-center space-x-8">
-            <div className="flex items-center space-x-2">
-              <Badge className="bg-green-500 text-white">
-                <Star className="w-4 h-4 mr-1" />
-                Easy
-              </Badge>
-              <span className="text-white">Perfect for beginners</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge className="bg-yellow-500 text-white">
-                <Clock className="w-4 h-4 mr-1" />
-                Medium
-              </Badge>
-              <span className="text-white">Some challenge required</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge className="bg-red-500 text-white">
-                <Zap className="w-4 h-4 mr-1" />
-                Hard
-              </Badge>
-              <span className="text-white">For experienced adventurers</span>
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-sky-400 to-sky-500 relative">
+      {/* Classic Poptropica Header */}
+      <div className="relative z-20 bg-sky-400 pb-4">
+        {/* Top navigation bar */}
+        <div className="px-6 py-4 flex justify-between items-center">
+          <Button 
+            variant="ghost" 
+            className="text-white hover:bg-white hover:bg-opacity-20 transition-colors duration-200"
+            onClick={() => navigate('/')}
+          >
+            <Home className="w-5 h-5 mr-2" />
+            Home
+          </Button>
+          
+          {/* Classic Poptropica Logo */}
+          <div className="flex items-center">
+            <div className="text-5xl font-bold text-white drop-shadow-2xl tracking-wide">
+              Poptropica
             </div>
           </div>
+
+          {/* Top right icons area */}
+          <div className="flex space-x-4">
+            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-white text-lg">🏠</div>
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-lg">📊</div>
+          </div>
         </div>
+
+        {/* Clouds decoration */}
+        <div className="absolute top-16 left-10 w-16 h-10 bg-white rounded-full opacity-80"></div>
+        <div className="absolute top-20 left-14 w-12 h-8 bg-white rounded-full opacity-80"></div>
+        <div className="absolute top-12 right-20 w-20 h-12 bg-white rounded-full opacity-80"></div>
+        <div className="absolute top-16 right-24 w-14 h-9 bg-white rounded-full opacity-80"></div>
       </div>
 
-      {/* Custom CSS for animations */}
+      {/* Classic Sandy Background */}
+      <div className="relative z-10 min-h-screen bg-gradient-to-b from-amber-200 to-amber-300" 
+           style={{
+             backgroundImage: `
+               radial-gradient(circle at 25% 25%, rgba(222, 184, 135, 0.3) 0%, transparent 25%),
+               radial-gradient(circle at 75% 75%, rgba(210, 180, 140, 0.2) 0%, transparent 25%),
+               radial-gradient(circle at 50% 100%, rgba(205, 165, 100, 0.1) 0%, transparent 50%)
+             `
+           }}>
+        
+        {/* Navigation arrows */}
+        <div className="absolute left-8 top-1/2 transform -translate-y-1/2 z-30">
+          <Button 
+            variant="ghost" 
+            size="lg"
+            className="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-none"
+            style={{ clipPath: 'polygon(0 50%, 100% 0, 100% 100%)' }}
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </Button>
+        </div>
+        
+        <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-30">
+          <Button 
+            variant="ghost" 
+            size="lg"
+            className="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-none"
+            style={{ clipPath: 'polygon(0 0, 100% 50%, 0 100%)' }}
+          >
+            <ChevronRight className="w-8 h-8" />
+          </Button>
+        </div>
+
+        {/* Yellow Balloon */}
+        <div className="absolute top-20 right-32 z-20">
+          <div className="text-6xl animate-float">🎈</div>
+        </div>
+
+        {/* Islands Grid - Classic Poptropica Layout */}
+        <div className="container mx-auto px-20 py-16">
+          
+          {/* Top Row */}
+          <div className="grid grid-cols-3 gap-16 mb-20">
+            {topRowIslands.map((island) => {
+              const progress = getIslandProgress(island.id);
+              const isLocked = island.status === 'locked';
+              const isCompleted = progress === 100;
+
+              return (
+                <div key={island.id} className="flex flex-col items-center">
+                  {/* Island Platform */}
+                  <Card 
+                    className={`relative w-48 h-48 rounded-3xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 border-4 ${
+                      isLocked ? 'opacity-60 cursor-not-allowed border-gray-400' : 
+                      isCompleted ? 'border-yellow-400 shadow-yellow-400/50' : 'border-amber-600'
+                    } shadow-2xl bg-gradient-to-b from-amber-100 to-amber-200`}
+                    onClick={() => !isLocked && navigate(`/game/${island.id}`)}
+                  >
+                    <CardContent className="p-0 h-full flex items-end justify-center relative">
+                      {/* Island Structure */}
+                      {getIslandStructure(island.id)}
+                      
+                      {/* Lock overlay */}
+                      {isLocked && (
+                        <div className="absolute inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center rounded-3xl">
+                          <div className="text-4xl">🔒</div>
+                        </div>
+                      )}
+                      
+                      {/* Completion star */}
+                      {isCompleted && (
+                        <div className="absolute top-2 right-2">
+                          <div className="text-3xl animate-pulse">⭐</div>
+                        </div>
+                      )}
+
+                      {/* Progress indicator */}
+                      {!isLocked && progress > 0 && (
+                        <div className="absolute bottom-2 left-2 right-2">
+                          <div className="bg-black bg-opacity-30 rounded-full h-2">
+                            <div 
+                              className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Island Label - Classic Yellow Style */}
+                  <div className="mt-4">
+                    <div className="bg-yellow-400 px-4 py-2 rounded-full border-2 border-yellow-600 shadow-lg">
+                      <div className="font-bold text-gray-800 text-sm uppercase tracking-wide">
+                        {island.name.replace(' Island', '').replace(' ', ' ')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom Row */}
+          <div className="grid grid-cols-3 gap-16">
+            {bottomRowIslands.map((island) => {
+              const progress = getIslandProgress(island.id);
+              const isLocked = island.status === 'locked';
+              const isCompleted = progress === 100;
+
+              return (
+                <div key={island.id} className="flex flex-col items-center">
+                  {/* Island Platform */}
+                  <Card 
+                    className={`relative w-48 h-48 rounded-3xl overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105 border-4 ${
+                      isLocked ? 'opacity-60 cursor-not-allowed border-gray-400' : 
+                      isCompleted ? 'border-yellow-400 shadow-yellow-400/50' : 'border-amber-600'
+                    } shadow-2xl bg-gradient-to-b from-amber-100 to-amber-200`}
+                    onClick={() => !isLocked && navigate(`/game/${island.id}`)}
+                  >
+                    <CardContent className="p-0 h-full flex items-end justify-center relative">
+                      {/* Island Structure */}
+                      {getIslandStructure(island.id)}
+                      
+                      {/* Lock overlay */}
+                      {isLocked && (
+                        <div className="absolute inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center rounded-3xl">
+                          <div className="text-4xl">🔒</div>
+                        </div>
+                      )}
+                      
+                      {/* Completion star */}
+                      {isCompleted && (
+                        <div className="absolute top-2 right-2">
+                          <div className="text-3xl animate-pulse">⭐</div>
+                        </div>
+                      )}
+
+                      {/* Progress indicator */}
+                      {!isLocked && progress > 0 && (
+                        <div className="absolute bottom-2 left-2 right-2">
+                          <div className="bg-black bg-opacity-30 rounded-full h-2">
+                            <div 
+                              className="bg-yellow-400 h-2 rounded-full transition-all duration-500"
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                  
+                  {/* Island Label - Classic Yellow Style */}
+                  <div className="mt-4">
+                    <div className="bg-yellow-400 px-4 py-2 rounded-full border-2 border-yellow-600 shadow-lg">
+                      <div className="font-bold text-gray-800 text-sm uppercase tracking-wide">
+                        {island.name.replace(' Island', '').replace(' ', ' ')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom Navigation Dots */}
+          <div className="flex justify-center mt-16 space-x-3">
+            {[1, 2, 3, 4, 5, 6, 7].map((dot, index) => (
+              <div 
+                key={dot}
+                className={`w-4 h-6 rounded-full border-2 ${
+                  index === 3 ? 'bg-yellow-400 border-yellow-600' : 'bg-gray-300 border-gray-400'
+                }`}
+              ></div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sandy texture overlay */}
+        <div 
+          className="absolute inset-0 opacity-10 pointer-events-none"
+          style={{
+            backgroundImage: `
+              repeating-linear-gradient(
+                45deg,
+                rgba(139, 69, 19, 0.1) 0px,
+                rgba(139, 69, 19, 0.1) 2px,
+                transparent 2px,
+                transparent 4px
+              )
+            `
+          }}
+        ></div>
+      </div>
+
+      {/* Custom animations */}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          33% { transform: translateY(-20px) translateX(10px); }
-          66% { transform: translateY(-10px) translateX(-5px); }
-        }
-        
-        @keyframes float-delay {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          33% { transform: translateY(-15px) translateX(-8px); }
-          66% { transform: translateY(-25px) translateX(12px); }
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-20px) rotate(5deg); }
         }
         
         .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        .animate-float-delay {
-          animation: float-delay 8s ease-in-out infinite;
+          animation: float 4s ease-in-out infinite;
         }
       `}</style>
     </div>

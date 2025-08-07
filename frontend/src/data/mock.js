@@ -1,6 +1,6 @@
 export const mockData = {
   defaultCharacter: {
-    name: "Adventurer",
+    name: "Poptropican",
     hair: "brown_short",
     outfit: "casual_blue",
     accessories: [],
@@ -97,52 +97,52 @@ export const mockData = {
       ]
     },
     {
-      id: "survival",
-      name: "Survival Island",
-      description: "Survive in the wilderness using your wits",
+      id: "monster_carnival",
+      name: "Monster Carnival Island",
+      description: "Explore the spooky carnival and uncover its mysteries",
+      difficulty: "Medium",
+      image: "/images/islands/monster_carnival.png",
+      status: "available",
+      quests: [
+        {
+          id: "carnival_quest_1",
+          name: "Rescue the Ring Master",
+          description: "Save the carnival from the monster invasion",
+          reward: "Carnival Costume",
+          completed: false
+        }
+      ]
+    },
+    {
+      id: "super_power",
+      name: "Super Power Island", 
+      description: "Gain superpowers and save the city from villains",
       difficulty: "Hard",
-      image: "/images/islands/survival.png",
+      image: "/images/islands/super_power.png",
+      status: "available",
+      quests: [
+        {
+          id: "power_quest_1",
+          name: "Stop the Super Villains",
+          description: "Use your new powers to defeat the evil villains",
+          reward: "Super Hero Costume",
+          completed: false
+        }
+      ]
+    },
+    {
+      id: "wild_west",
+      name: "Wild West Island",
+      description: "Ride into the frontier and become a cowboy legend",
+      difficulty: "Medium", 
+      image: "/images/islands/wild_west.png",
       status: "locked",
       quests: [
         {
-          id: "survival_quest_1",
-          name: "Build Shelter",
-          description: "Create a safe place to survive the night",
-          reward: "Survival Kit",
-          completed: false
-        }
-      ]
-    },
-    {
-      id: "shrink_ray",
-      name: "Shrink Ray Island",
-      description: "Get shrunk down to microscopic size",
-      difficulty: "Medium",
-      image: "/images/islands/shrink_ray.png",
-      status: "available",
-      quests: [
-        {
-          id: "shrink_quest_1",
-          name: "Navigate the Microscopic World",
-          description: "Find your way back to normal size",
-          reward: "Shrink Ray Device",
-          completed: false
-        }
-      ]
-    },
-    {
-      id: "ghost_story",
-      name: "Ghost Story Island",
-      description: "Solve the mystery of the haunted mansion",
-      difficulty: "Medium",
-      image: "/images/islands/ghost_story.png",
-      status: "available",
-      quests: [
-        {
-          id: "ghost_quest_1",
-          name: "Investigate the Mansion",
-          description: "Uncover the secrets of the haunted house",
-          reward: "Ghost Detector",
+          id: "west_quest_1",
+          name: "Tame the Wild Horse",
+          description: "Prove yourself as a true cowboy by taming El Mustachio Grande",
+          reward: "Cowboy Hat",
           completed: false
         }
       ]

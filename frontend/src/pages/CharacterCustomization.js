@@ -8,6 +8,7 @@ import { Home, Save, RotateCcw } from 'lucide-react';
 import { useGame } from '../contexts/GameContext';
 import { mockData } from '../data/mock';
 import { useToast } from '../hooks/use-toast';
+import PoptropicaCharacter from '../components/PoptropicaCharacter';
 
 const CharacterCustomization = () => {
   const navigate = useNavigate();
@@ -47,15 +48,8 @@ const CharacterCustomization = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0">
-        <div className="absolute top-16 left-20 w-24 h-24 bg-white bg-opacity-20 rounded-full animate-pulse"></div>
-        <div className="absolute top-40 right-16 w-32 h-32 bg-yellow-300 bg-opacity-25 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-24 left-1/3 w-20 h-20 bg-pink-300 bg-opacity-30 rounded-full animate-pulse delay-300"></div>
-      </div>
-
-      {/* Navigation Header */}
+    <div className="min-h-screen bg-gradient-to-b from-sky-400 to-sky-500 relative overflow-hidden">
+      {/* Classic Poptropica Header */}
       <nav className="relative z-10 p-6 flex justify-between items-center bg-white bg-opacity-10 backdrop-blur-sm">
         <Button 
           variant="ghost" 
@@ -66,7 +60,7 @@ const CharacterCustomization = () => {
           Home
         </Button>
         
-        <h1 className="text-3xl font-bold text-white drop-shadow-lg">Character Customization</h1>
+        <h1 className="text-4xl font-bold text-white drop-shadow-lg">Character Creator</h1>
         
         <div className="flex space-x-2">
           <Button 
@@ -92,79 +86,81 @@ const CharacterCustomization = () => {
       <div className="relative z-10 container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Character Preview */}
+          {/* Character Preview - Classic Poptropica Style */}
           <div className="lg:col-span-1">
-            <Card className="bg-white bg-opacity-95 shadow-2xl border-0 sticky top-8">
-              <CardHeader>
-                <CardTitle className="text-2xl text-center text-gray-800">Your Character</CardTitle>
+            <Card className="bg-white bg-opacity-95 shadow-2xl border-4 border-yellow-400 sticky top-8">
+              <CardHeader className="bg-yellow-400 text-center">
+                <CardTitle className="text-2xl text-gray-800">Your Poptropican</CardTitle>
               </CardHeader>
-              <CardContent className="text-center">
-                {/* Character Name */}
+              <CardContent className="text-center p-8">
+                {/* Character Name Input */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Character Name
-                  </label>
                   <Input
                     value={characterName}
                     onChange={(e) => setCharacterName(e.target.value)}
-                    className="text-center font-medium text-lg"
+                    className="text-center font-bold text-lg border-2 border-yellow-400"
                     placeholder="Enter character name"
                   />
                 </div>
 
-                {/* Character Avatar Preview */}
-                <div className="mb-6 p-8 bg-gradient-to-b from-sky-200 to-emerald-200 rounded-lg">
-                  <div className="w-32 h-32 mx-auto bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-4xl text-white shadow-lg">
-                    👤
-                  </div>
-                  <div className="mt-4 text-lg font-bold text-gray-700">
-                    {characterName || 'Your Character'}
-                  </div>
-                  <div className="mt-2 text-sm text-gray-600">
-                    Outfit: {mockData.characterOptions.outfit.find(o => o.id === tempCharacter.outfit)?.name || 'Unknown'}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Hair: {mockData.characterOptions.hair.find(h => h.id === tempCharacter.hair)?.name || 'Unknown'}
-                  </div>
-                  {tempCharacter.accessories.length > 0 && (
-                    <div className="text-sm text-gray-600">
-                      Accessories: {tempCharacter.accessories.length}
-                    </div>
-                  )}
+                {/* Character Avatar - Now using the Poptropica-style component */}
+                <div className="mb-6 p-6 bg-gradient-to-b from-sky-200 to-green-200 rounded-lg border-4 border-blue-400">
+                  <PoptropicaCharacter 
+                    character={{ ...tempCharacter, name: characterName }} 
+                    size="xl"
+                  />
                 </div>
 
-                {/* Quick Stats */}
+                {/* Character Stats */}
                 <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="bg-blue-100 p-3 rounded-lg">
+                  <div className="bg-yellow-100 p-3 rounded-lg border-2 border-yellow-400">
                     <div className="text-sm text-gray-600">Style Points</div>
-                    <div className="text-xl font-bold text-blue-600">
+                    <div className="text-xl font-bold text-yellow-600">
                       {tempCharacter.accessories.length * 25 + 100}
                     </div>
                   </div>
-                  <div className="bg-purple-100 p-3 rounded-lg">
+                  <div className="bg-blue-100 p-3 rounded-lg border-2 border-blue-400">
                     <div className="text-sm text-gray-600">Uniqueness</div>
-                    <div className="text-xl font-bold text-purple-600">
+                    <div className="text-xl font-bold text-blue-600">
                       {Math.min(100, tempCharacter.accessories.length * 15 + 40)}%
                     </div>
                   </div>
                 </div>
+
+                {/* Random Character Button */}
+                <Button
+                  className="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2"
+                  onClick={() => {
+                    const randomHair = mockData.characterOptions.hair[Math.floor(Math.random() * mockData.characterOptions.hair.length)];
+                    const randomOutfit = mockData.characterOptions.outfit[Math.floor(Math.random() * mockData.characterOptions.outfit.length)];
+                    const randomSkin = mockData.characterOptions.skin[Math.floor(Math.random() * mockData.characterOptions.skin.length)];
+                    setTempCharacter(prev => ({
+                      ...prev,
+                      hair: randomHair.id,
+                      outfit: randomOutfit.id,
+                      skin: randomSkin.id
+                    }));
+                  }}
+                >
+                  🎲 Random Look
+                </Button>
               </CardContent>
             </Card>
           </div>
 
-          {/* Customization Options */}
+          {/* Customization Options - Classic Poptropica Style */}
           <div className="lg:col-span-2">
-            <Card className="bg-white bg-opacity-95 shadow-2xl border-0">
-              <CardHeader>
-                <CardTitle className="text-2xl text-gray-800">Customize Your Look</CardTitle>
+            <Card className="bg-white bg-opacity-95 shadow-2xl border-4 border-blue-400">
+              <CardHeader className="bg-blue-400 text-white">
+                <CardTitle className="text-2xl">Customize Your Poptropican</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
                 <Tabs defaultValue="hair" className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 mb-6">
-                    <TabsTrigger value="hair">Hair</TabsTrigger>
-                    <TabsTrigger value="outfit">Outfits</TabsTrigger>
-                    <TabsTrigger value="accessories">Accessories</TabsTrigger>
-                    <TabsTrigger value="skin">Skin</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-4 mb-6 bg-yellow-400">
+                    <TabsTrigger value="hair" className="data-[state=active]:bg-white">Hair</TabsTrigger>
+                    <TabsTrigger value="outfit" className="data-[state=active]:bg-white">Outfits</TabsTrigger>
+                    <TabsTrigger value="accessories" className="data-[state=active]:bg-white">Accessories</TabsTrigger>
+                    <TabsTrigger value="skin" className="data-[state=active]:bg-white">Skin</TabsTrigger>
                   </TabsList>
 
                   {/* Hair Options */}
@@ -173,19 +169,24 @@ const CharacterCustomization = () => {
                       {mockData.characterOptions.hair.map((hair) => (
                         <div
                           key={hair.id}
-                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
+                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-4 ${
                             tempCharacter.hair === hair.id
-                              ? 'border-purple-500 bg-purple-100 shadow-lg transform scale-105'
-                              : 'border-gray-200 bg-gray-50 hover:border-purple-300 hover:shadow-md hover:scale-102'
+                              ? 'border-yellow-400 bg-yellow-100 shadow-lg transform scale-105'
+                              : 'border-gray-300 bg-gray-50 hover:border-yellow-300 hover:shadow-md hover:scale-102'
                           }`}
                           onClick={() => handleCustomizationChange('hair', hair.id)}
                         >
-                          <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
+                          <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl border-2 border-amber-600">
                             💇‍♀️
                           </div>
-                          <div className="text-center text-sm font-medium text-gray-700">
+                          <div className="text-center text-sm font-bold text-gray-700">
                             {hair.name}
                           </div>
+                          {tempCharacter.hair === hair.id && (
+                            <div className="text-center text-xs text-yellow-600 mt-1 font-bold">
+                              ✓ SELECTED
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -197,19 +198,24 @@ const CharacterCustomization = () => {
                       {mockData.characterOptions.outfit.map((outfit) => (
                         <div
                           key={outfit.id}
-                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
+                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-4 ${
                             tempCharacter.outfit === outfit.id
-                              ? 'border-blue-500 bg-blue-100 shadow-lg transform scale-105'
-                              : 'border-gray-200 bg-gray-50 hover:border-blue-300 hover:shadow-md hover:scale-102'
+                              ? 'border-blue-400 bg-blue-100 shadow-lg transform scale-105'
+                              : 'border-gray-300 bg-gray-50 hover:border-blue-300 hover:shadow-md hover:scale-102'
                           }`}
                           onClick={() => handleCustomizationChange('outfit', outfit.id)}
                         >
-                          <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
+                          <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl border-2 border-blue-600">
                             👕
                           </div>
-                          <div className="text-center text-sm font-medium text-gray-700">
+                          <div className="text-center text-sm font-bold text-gray-700">
                             {outfit.name}
                           </div>
+                          {tempCharacter.outfit === outfit.id && (
+                            <div className="text-center text-xs text-blue-600 mt-1 font-bold">
+                              ✓ EQUIPPED
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -221,22 +227,22 @@ const CharacterCustomization = () => {
                       {mockData.characterOptions.accessories.map((accessory) => (
                         <div
                           key={accessory.id}
-                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
+                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-4 ${
                             tempCharacter.accessories.includes(accessory.id)
-                              ? 'border-green-500 bg-green-100 shadow-lg transform scale-105'
-                              : 'border-gray-200 bg-gray-50 hover:border-green-300 hover:shadow-md hover:scale-102'
+                              ? 'border-green-400 bg-green-100 shadow-lg transform scale-105'
+                              : 'border-gray-300 bg-gray-50 hover:border-green-300 hover:shadow-md hover:scale-102'
                           }`}
                           onClick={() => handleAccessoryToggle(accessory.id)}
                         >
-                          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl">
+                          <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl border-2 border-green-600">
                             ⭐
                           </div>
-                          <div className="text-center text-sm font-medium text-gray-700">
+                          <div className="text-center text-sm font-bold text-gray-700">
                             {accessory.name}
                           </div>
                           {tempCharacter.accessories.includes(accessory.id) && (
-                            <div className="text-center text-xs text-green-600 mt-1 font-medium">
-                              ✓ Equipped
+                            <div className="text-center text-xs text-green-600 mt-1 font-bold">
+                              ✓ EQUIPPED
                             </div>
                           )}
                         </div>
@@ -250,20 +256,25 @@ const CharacterCustomization = () => {
                       {mockData.characterOptions.skin.map((skin) => (
                         <div
                           key={skin.id}
-                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-2 ${
+                          className={`p-4 rounded-lg cursor-pointer transition-all duration-200 border-4 ${
                             tempCharacter.skin === skin.id
-                              ? 'border-orange-500 bg-orange-100 shadow-lg transform scale-105'
-                              : 'border-gray-200 bg-gray-50 hover:border-orange-300 hover:shadow-md hover:scale-102'
+                              ? 'border-orange-400 bg-orange-100 shadow-lg transform scale-105'
+                              : 'border-gray-300 bg-gray-50 hover:border-orange-300 hover:shadow-md hover:scale-102'
                           }`}
                           onClick={() => handleCustomizationChange('skin', skin.id)}
                         >
                           <div 
-                            className="w-16 h-16 rounded-full mx-auto mb-3 border-4 border-white shadow-md"
+                            className="w-16 h-16 rounded-full mx-auto mb-3 border-4 border-white shadow-lg"
                             style={{ backgroundColor: skin.color }}
                           ></div>
-                          <div className="text-center text-sm font-medium text-gray-700">
+                          <div className="text-center text-sm font-bold text-gray-700">
                             {skin.name}
                           </div>
+                          {tempCharacter.skin === skin.id && (
+                            <div className="text-center text-xs text-orange-600 mt-1 font-bold">
+                              ✓ SELECTED
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
