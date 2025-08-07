@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Play, Map, User, Package } from 'lucide-react';
 import { useGame } from '../contexts/GameContext';
+import PoptropicaCharacter from '../components/PoptropicaCharacter';
 
 const HomePage = () => {
   const navigate = useNavigate();
