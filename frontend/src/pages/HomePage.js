@@ -31,7 +31,9 @@ const HomePage = () => {
         
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2 bg-white bg-opacity-20 rounded-full px-4 py-2">
-            <User className="w-5 h-5 text-white" />
+            <div className="w-8 h-8">
+              <PoptropicaCharacter character={character} size="sm" />
+            </div>
             <span className="text-white font-medium">{character.name}</span>
           </div>
         </div>
